@@ -1,1 +1,25 @@
-
+{
+  "question": {
+    "title": "What are my production data stores and their encryption status?",
+    "tags": ["SecOps"],
+    "description": "Returns a list of all production entities.",
+    "queries": [
+      {
+        "name": "prod-datastores-encrypted",
+        "query": "Find * with tag.Production=true and encrypted=true",
+        "resultsAre": "GOOD"
+      },
+      {
+        "name": "prod-datastores-unencrypted",
+        "query": "Find * with tag.Production=true and encrypted!=true",
+        "resultsAre": "BAD"
+      }
+    ],
+    "compliance": [
+      {
+        "standard": "NIST CSF",
+        "requirements": ["ID.AM-1"]
+      }
+    ]
+  }
+}
