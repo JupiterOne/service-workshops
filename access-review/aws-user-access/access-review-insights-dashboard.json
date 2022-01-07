@@ -1,0 +1,166 @@
+{
+	"widgets": [
+		{
+			"id": "4c9d4423-88ab-4636-b20f-aeaea392e684",
+			"title": "Policies with Access to Production Resources",
+			"type": "graph",
+			"config": {
+				"queries": [
+					{
+						"name": "query1",
+						"query": "find AccessPolicy that allows * with tag.Production=true \nreturn tree"
+					}
+				]
+			}
+		},
+		{
+			"id": "12c400c2-7493-41f3-bc02-c4e674b27f72",
+			"title": "Permissions assigned with administrator/privileged access",
+			"type": "table",
+			"config": {
+				"queries": [
+					{
+						"name": "query1",
+						"query": "find AccessPolicy with admin=true as policy\nthat assigned * as e\nreturn e.displayName, e.webLink, policy.displayName, policy.webLink"
+					}
+				]
+			}
+		},
+		{
+			"id": "e92327db-fb23-404d-9273-d7343d6b0bf5",
+			"title": "Policies with access to S3",
+			"type": "graph",
+			"config": {
+				"queries": [
+					{
+						"name": "query1",
+						"query": "find (aws_s3_bucket|aws_s3) \nthat allows AccessPolicy \nreturn tree"
+					}
+				]
+			}
+		},
+		{
+			"id": "e79718a1-1f71-41c1-a1d4-2265ac8f296f",
+			"title": "Anything with DeleteObject or PutObject permissions for S3",
+			"type": "graph",
+			"config": {
+				"queries": [
+					{
+						"name": "query1",
+						"query": "find (aws_s3_bucket|aws_s3) with tag.Production=true \nthat allows as a * \nwhere a.actions~=('s3:DeleteObject' or 's3:PutObject') \nreturn tree"
+					}
+				]
+			}
+		},
+		{
+			"id": "e0d9a823-0905-4cf0-ad2e-af2af69f4604",
+			"title": "Find anything that allows public access to everyone",
+			"type": "graph",
+			"config": {
+				"queries": [
+					{
+						"name": "query1",
+						"query": "find Everyone that allows * \nreturn tree\n"
+					}
+				]
+			}
+		},
+		{
+			"id": "66e3e059-d2c7-45a2-8385-0d953f01a0d7",
+			"title": "Who is assigned access to S3",
+			"type": "graph",
+			"config": {
+				"queries": [
+					{
+						"name": "query1",
+						"query": "find (aws_s3_bucket|aws_s3) \nthat allows as rule AccessPolicy as policy \n(that assigned AccessRole)?\n(that assigned UserGroup)? \nthat (assigned|has) User \nreturn tree"
+					}
+				]
+			}
+		},
+		{
+			"id": "ebe7941b-5502-4699-bb74-51d4c92c5162",
+			"title": "Who has what access to s3",
+			"type": "table",
+			"config": {
+				"queries": [
+					{
+						"name": "query1",
+						"query": "find (aws_s3_bucket|aws_s3) as s3\nthat allows as rule AccessPolicy as ap \n(that assigned AccessRole)?\n(that assigned UserGroup)? \nthat (assigned|has) User as u\nreturn u.displayName, ap.displayName, s3.displayName, rule.actions"
+					}
+				]
+			}
+		}
+	],
+	"layouts": {
+		"xs": [],
+		"sm": [],
+		"md": [],
+		"lg": [
+			{
+				"w": 6,
+				"h": 4,
+				"x": 0,
+				"y": 0,
+				"i": "4c9d4423-88ab-4636-b20f-aeaea392e684",
+				"moved": false,
+				"static": false
+			},
+			{
+				"w": 12,
+				"h": 2,
+				"x": 0,
+				"y": 4,
+				"i": "12c400c2-7493-41f3-bc02-c4e674b27f72",
+				"moved": false,
+				"static": false
+			},
+			{
+				"w": 6,
+				"h": 4,
+				"x": 6,
+				"y": 6,
+				"i": "e92327db-fb23-404d-9273-d7343d6b0bf5",
+				"moved": false,
+				"static": false
+			},
+			{
+				"w": 6,
+				"h": 4,
+				"x": 0,
+				"y": 6,
+				"i": "e79718a1-1f71-41c1-a1d4-2265ac8f296f",
+				"moved": false,
+				"static": false
+			},
+			{
+				"w": 6,
+				"h": 4,
+				"x": 6,
+				"y": 0,
+				"i": "e0d9a823-0905-4cf0-ad2e-af2af69f4604",
+				"moved": false,
+				"static": false
+			},
+			{
+				"w": 6,
+				"h": 4,
+				"x": 0,
+				"y": 10,
+				"i": "66e3e059-d2c7-45a2-8385-0d953f01a0d7",
+				"moved": false,
+				"static": false
+			},
+			{
+				"w": 6,
+				"h": 4,
+				"x": 6,
+				"y": 10,
+				"i": "ebe7941b-5502-4699-bb74-51d4c92c5162",
+				"moved": false,
+				"static": false
+			}
+		],
+		"xl": []
+	}
+}
