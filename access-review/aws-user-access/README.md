@@ -83,7 +83,11 @@ We should notice that a policy can be `ASSIGNED` to a `User`, `AccessRole`, and 
 **S3 Assigned Roles, UserGroups, and Users:**
 
 ```
-Find (aws_s3_bucket|aws_s3) that ALLOWS as rule AccessPolicy as policy (THAT ASSIGNED AccessRole)? (THAT ASSIGNED UserGroup)? THAT (ASSIGNED|HAS) User Return Tree
+Find (aws_s3_bucket|aws_s3) 
+  THAT ALLOWS as rule AccessPolicy as policy 
+  (THAT ASSIGNED AccessRole)? 
+  (THAT ASSIGNED UserGroup)? 
+  THAT (ASSIGNED|HAS) User Return Tree
 ```
 
 Lastly, lets identify any User that can access our AWS environment:
@@ -91,5 +95,9 @@ Lastly, lets identify any User that can access our AWS environment:
 **All Users who have access to AWS Environment:** 
 
 ```
-Find UNIQUE User (THAT (ASSIGNED|HAS) UserGroup)? (THAT ASSIGNED AccessRole)? THAT ASSIGNED AccessPolicy THAT ALLOWS * with _type^="aws"
+Find UNIQUE User 
+  (THAT (ASSIGNED|HAS) UserGroup)? 
+  (THAT ASSIGNED AccessRole)? 
+  THAT ASSIGNED AccessPolicy 
+  THAT ALLOWS * with _type^="aws"
 ```
