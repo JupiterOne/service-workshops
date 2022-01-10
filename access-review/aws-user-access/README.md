@@ -18,7 +18,9 @@ Our first step will be to identify the policies in our organizations environment
 
 **IAM Policies in your production environment:**
 
-```FIND AccessPolicy THAT ALLOWS * WITH tag.Production=true```
+```
+FIND AccessPolicy THAT ALLOWS * WITH tag.Production=true
+```
 
 This query will show any `AccessPolicy` that has an `ALLOWS` relationship with a entity tagged as production. This may include on Cloud Service Providers (CSPs) `AccessPolicy`. The list below contains the AWS IAM Policy types:
 
@@ -36,7 +38,9 @@ If we wanted to target a specific service, we can choose a service and entity ty
 
 **AWS S3 Buckets and Service with Access Policies that ALLOW actions:**
 
-```Find (aws_s3_bucket|aws_s3) THAT ALLOWS AccessPolicy RETURN TREE```
+```
+Find (aws_s3_bucket|aws_s3) THAT ALLOWS AccessPolicy RETURN TREE
+```
 
 //Screenshot
 
@@ -50,7 +54,9 @@ We will want to generate a report that can show these details in a spreadsheet o
 
 **S3 Policy Review - Actions and Resources**
 
-```Find (aws_s3_bucket|aws_s3) that ALLOWS as rule AccessPolicy as policy Return policy.displayName, rule.actions, rule.resources```
+```
+Find (aws_s3_bucket|aws_s3) that ALLOWS as rule AccessPolicy as policy Return policy.displayName, rule.actions, rule.resources
+```
 
 In the example above, we as `as rule` and `as policy` to alias our `ALLOWS` relationship and entity. We can then use `RETURN` to choose which properties we want to include.
 
@@ -58,7 +64,9 @@ We may find that certain actions are over-privileged. In that case, we can filte
 
 **Policies that have `:*` configured as an action:**
 
-```Find (aws_s3_bucket|aws_s3) that ALLOWS as rule AccessPolicy as policy WHERE rule.actions~=":*" Return policy.displayName, rule.actions, rule.resources```
+```
+Find (aws_s3_bucket|aws_s3) that ALLOWS as rule AccessPolicy as policy WHERE rule.actions~=":*" Return policy.displayName, rule.actions, rule.resources
+```
 
 This can be turned into an Alert using the alert rules processes: (Link to support docs)
 
@@ -66,16 +74,22 @@ We've identified that actions and resources attached and configured in our AWS e
 
 **S3 Principle:**
 
-```Find (aws_s3_bucket|aws_s3) that ALLOWS as rule AccessPolicy as policy THAT ASSIGNED (AccessRole|UserGroup|User) as principles Return Tree```
+```
+Find (aws_s3_bucket|aws_s3) that ALLOWS as rule AccessPolicy as policy THAT ASSIGNED (AccessRole|UserGroup|User) as principles Return Tree
+```
 
 We should notice that a policy can be `ASSIGNED` to a `User`, `AccessRole`, and `UserGroup`. For our next query, we can use the optional traversal operators to include the scenarios where users can be assigned access through a `AccessRole`, or `UserGroup`:
 
 **S3 Assigned Roles, UserGroups, and Users:**
 
-```Find (aws_s3_bucket|aws_s3) that ALLOWS as rule AccessPolicy as policy (THAT ASSIGNED AccessRole)? (THAT ASSIGNED UserGroup)? THAT (ASSIGNED|HAS) User Return Tree```
+```
+Find (aws_s3_bucket|aws_s3) that ALLOWS as rule AccessPolicy as policy (THAT ASSIGNED AccessRole)? (THAT ASSIGNED UserGroup)? THAT (ASSIGNED|HAS) User Return Tree
+```
 
 Lastly, lets identify any User that can access our AWS environment:
 
 **All Users who have access to AWS Environment:** 
 
-```Find UNIQUE User (THAT (ASSIGNED|HAS) UserGroup)? (THAT ASSIGNED AccessRole)? THAT ASSIGNED AccessPolicy THAT ALLOWS * with _type^="aws"```
+```
+Find UNIQUE User (THAT (ASSIGNED|HAS) UserGroup)? (THAT ASSIGNED AccessRole)? THAT ASSIGNED AccessPolicy THAT ALLOWS * with _type^="aws"
+```
