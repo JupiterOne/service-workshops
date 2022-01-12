@@ -44,13 +44,13 @@ Find (aws_s3_bucket|aws_s3) THAT ALLOWS AccessPolicy RETURN TREE
 
 <!--Screenshot-->
 
-In our example above, we use `RETURN TREE` to show the graph view in the JupiterOne platform. In addition, we used the `(|)` operators to select multiple types. In the query above, we will see that not only can an AccessPolicy ALLOWS access to an individual bucket, but as well as the S3 Service.
+>In our example above, we use `RETURN TREE` to show the graph view in the JupiterOne platform. In addition, we used the `(|)` operators to select multiple types. In the query above, we will see that not only can an AccessPolicy ALLOWS access to an individual bucket, but as well as the S3 Service.
 
 If you click the ALLOWS relationship, you will see that the actions associated with the policy attached to the resource. 
 
 <!--Screenshot-->
 
-We will want to generate a report that can show these details in a spreadsheet or JSON format. We can use aliasing to just that:
+We will want to generate a report that can show these details in a spreadsheet or JSON format. We can use aliasing to format our data:
 
 **S3 Policy Review - Actions and Resources**
 
@@ -58,16 +58,20 @@ We will want to generate a report that can show these details in a spreadsheet o
 Find (aws_s3_bucket|aws_s3) that ALLOWS as rule AccessPolicy as policy Return policy.displayName, rule.actions, rule.resources
 ```
 
-In the example above, we as `as rule` and `as policy` to alias our `ALLOWS` relationship and entity. We can then use `RETURN` to choose which properties we want to include.
+>In the example above, we use `as rule` and `as policy` to alias our `ALLOWS` relationship and entity. We can then use `RETURN` to choose which properties we want to include in our output.
+
+<!--Screenshot-->
 
 We may find that certain actions are over-privileged. In that case, we can filter for actions that are of unnecessary or dangerous:
 
 **Policies that have `:*` configured as an action:**
 
 ```
-Find (aws_s3_bucket|aws_s3) that ALLOWS as rule AccessPolicy as policy WHERE rule.actions~=":*" Return policy.displayName, rule.actions, rule.resources
+Find (aws_s3_bucket|aws_s3) 
+  THAT ALLOWS as rule AccessPolicy as policy 
+  WHERE rule.actions~=":*" Return policy.displayName, rule.actions, rule.resources
 ```
-
+_todo other examples of alerts, time contrainted as well as comparing values_
 This can be turned into an Alert using the alert rules processes: (Link to support docs)
 
 We've identified that actions and resources attached and configured in our AWS environment. Now lets evaluate the principle. A principle can be a role, user group, or user. Lets see what principle are directly assigned to a policy:
@@ -75,10 +79,13 @@ We've identified that actions and resources attached and configured in our AWS e
 **S3 Principle:**
 
 ```
-Find (aws_s3_bucket|aws_s3) that ALLOWS as rule AccessPolicy as policy THAT ASSIGNED (AccessRole|UserGroup|User) as principles Return Tree
+Find (aws_s3_bucket|aws_s3) 
+  that ALLOWS as rule AccessPolicy as policy 
+  THAT ASSIGNED (AccessRole|UserGroup|User) as principles 
+  Return Tree
 ```
 
-We should notice that a policy can be `ASSIGNED` to a `User`, `AccessRole`, and `UserGroup`. For our next query, we can use the optional traversal operators to include the scenarios where users can be assigned access through a `AccessRole`, or `UserGroup`:
+We should notice that a policy can be `ASSIGNED` to a `User`, `AccessRole`, and `UserGroup`. For our next query, we can use the optional traversal operators to include the scenarios where users can be assigned access through a `AccessRole`, a `UserGroup`, or directly inline:
 
 **S3 Assigned Roles, UserGroups, and Users:**
 
@@ -95,9 +102,10 @@ Lastly, lets identify any User that can access our AWS environment:
 **All Users who have access to AWS Environment:** 
 
 ```
-Find UNIQUE User 
+Find UNIQUE User as u
   (THAT (ASSIGNED|HAS) UserGroup)? 
   (THAT ASSIGNED AccessRole)? 
   THAT ASSIGNED AccessPolicy 
-  THAT ALLOWS * with _type^="aws"
+  THAT ALLOWS * with _type^="aws" 
+  Return u.displayName, u._type, u.email
 ```
