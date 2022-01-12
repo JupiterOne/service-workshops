@@ -115,3 +115,9 @@ Find UNIQUE User as u
 https://support.jupiterone.io/hc/en-us/articles/360024909153-Identity-People-and-Privileged-access#whoorwhatservicehasbeenassignedpermissionswithadministratorprivilegedaccess
 
 https://ask.us.jupiterone.io/filter?categories=Access&tagFilter=all
+
+**Alert Ideas**
+Principal Added in 24 hours
+```
+Find * THAT ALLOWS as r AccessPolicy that ASSIGNED as a * where r.admin=true AND a._createdOn > date.now-24hour
+```
