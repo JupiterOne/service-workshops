@@ -72,11 +72,12 @@ Find (aws_s3_bucket|aws_s3)
   WHERE rule.actions~=":*" Return policy.displayName, rule.actions, rule.resources
 ```
 _todo other examples of alerts, time contrainted as well as comparing values_
+
 This can be turned into an Alert using the alert rules processes: (Link to support docs)
 
-We've identified that actions and resources attached and configured in our AWS environment. Now lets evaluate the principle. A principle can be a role, user group, or user. Lets see what principle are directly assigned to a policy:
+We've identified that actions and resources attached and configured in our AWS environment. Now lets evaluate the principal. A principal can be a role, user group, or user. Lets see what principal are directly assigned to a policy:
 
-**S3 Principle:**
+**S3 Principal:**
 
 ```
 Find (aws_s3_bucket|aws_s3) 
