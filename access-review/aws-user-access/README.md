@@ -110,3 +110,8 @@ Find UNIQUE User as u
   THAT ALLOWS * with _type^="aws" 
   Return u.displayName, u._type, u.email
 ```
+**Relevant Materials**
+
+https://support.jupiterone.io/hc/en-us/articles/360024909153-Identity-People-and-Privileged-access#whoorwhatservicehasbeenassignedpermissionswithadministratorprivilegedaccess
+
+https://ask.us.jupiterone.io/filter?categories=Access&tagFilter=all
