@@ -32,7 +32,7 @@ IAM Role Policy     `aws_iam_role_policy`
 
 IAM Managed Policy  `aws_iam_policy `
 
-//S3 Bucket Policy    `aws_s3_bucket_policy`
+<!--S3 Bucket Policy    `aws_s3_bucket_policy` -->
 
 If we wanted to target a specific service, we can choose a service and entity type to scope our Access Review. In the query below, we will evaluate the AWS S3 Service along with AWS S3 Buckets type:
 
@@ -42,13 +42,13 @@ If we wanted to target a specific service, we can choose a service and entity ty
 Find (aws_s3_bucket|aws_s3) THAT ALLOWS AccessPolicy RETURN TREE
 ```
 
-//Screenshot
+<!--Screenshot-->
 
 In our example above, we use `RETURN TREE` to show the graph view in the JupiterOne platform. In addition, we used the `(|)` operators to select multiple types. In the query above, we will see that not only can an AccessPolicy ALLOWS access to an individual bucket, but as well as the S3 Service.
 
 If you click the ALLOWS relationship, you will see that the actions associated with the policy attached to the resource. 
 
-//Screenshot
+<!--Screenshot-->
 
 We will want to generate a report that can show these details in a spreadsheet or JSON format. We can use aliasing to just that:
 
