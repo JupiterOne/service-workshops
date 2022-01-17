@@ -1,0 +1,44 @@
+{
+  "id": "46f5b356-e627-4d24-9b6b-9d4163eeef27",
+  "name": "aws-s3-public-access-via-ec2-instances-iam",
+  "description": "Non-public S3 buckets accessible via public facing EC2 instances and their assigned IAM roles/policies.",
+  "version": 1,
+  "specVersion": 1,
+  "pollingInterval": "ONE_DAY",
+  "templates": {},
+  "outputs": [
+    "queries.query0.total",
+    "alertLevel"
+  ],
+  "question": {
+    "queries": [
+      {
+        "name": "query0",
+        "query": "find UNIQUE Internet\n  that allows as rule aws_security_group\n  that protects aws_instance with active=true as instance\n  that uses aws_iam_role as role\n  that assigned AccessPolicy as policy\n  that allows (aws_s3|aws_s3_bucket) with classification!='public' as s3\nreturn\n  s3.tag.AccountName, s3.bucketName, instance.name, instance.instanceId, instance.owner, instance.webLink, role.roleName, policy.displayName",
+        "version": "1"
+      }
+    ]
+  },
+  "operations": [
+    {
+      "when": {
+        "type": "FILTER",
+        "specVersion": 1,
+        "condition": "{{queries.query0.total > 0}}"
+      },
+      "actions": [
+        {
+          "targetValue": "HIGH",
+          "id": "995eb166-ee99-424c-a776-afeab28f4e35",
+          "type": "SET_PROPERTY",
+          "targetProperty": "alertLevel"
+        },
+        {
+          "type": "CREATE_ALERT",
+          "id": "b067cdd9-c63d-4336-91b1-9ec05ffd55d5"
+        }
+      ]
+    }
+  ],
+  "tags": []
+}
