@@ -1,0 +1,50 @@
+{
+  "id": "ec1ec0b2-47ee-428b-9c8d-44af489367ca",
+  "name": "aws-s3-public-access-via-cloudfront",
+  "description": "Non-public S3 buckets accessible via cloudfront distribution gateways.",
+  "version": 1,
+  "specVersion": 1,
+  "pollingInterval": "ONE_DAY",
+  "templates": {},
+  "outputs": [
+    "queries.query0.total",
+    "alertLevel"
+  ],
+  "question": {
+    "queries": [
+      {
+        "name": "query0",
+        "query": "find Internet\n  that CONNECTS aws_cloudfront_distribution with active=true as cloudfront\n  that CONNECTS aws_s3_bucket with classification!='public' as s3\nreturn\n  s3.bucketName, s3.tag.AccountName, s3.ownerId, s3.owner, s3.webLink,\n  cloudfront.domainName, cloudfront.tag.AccountName, cloudfront.webLink",
+        "version": "1"
+      }
+    ]
+  },
+  "operations": [
+    {
+      "when": {
+        "type": "FILTER",
+        "specVersion": 1,
+        "condition": [
+          "AND",
+          [
+            "queries.query0.total",
+            ">",
+            0
+          ]
+        ]
+      },
+      "actions": [
+        {
+          "targetValue": "HIGH",
+          "id": "1",
+          "type": "SET_PROPERTY",
+          "targetProperty": "alertLevel"
+        },
+        {
+          "type": "CREATE_ALERT",
+          "id": "1"
+        }
+      ]
+    }
+  ]
+}
