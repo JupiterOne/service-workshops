@@ -1,0 +1,253 @@
+{
+	"widgets": [
+		{
+			"id": "adf85428-00dd-4903-a621-09509fffe5fd",
+			"title": "AWS Database Backup Cost per Account",
+			"type": "pie",
+			"config": {
+				"queries": [
+					{
+						"name": "query0",
+						"query": "FIND (aws_db_cluster_snapshot|aws_db_snapshot) as snapshot\n  RETURN\n    snapshot.tag.AccountName as name,\n    sum(snapshot.allocatedStorage) * 0.02 as value"
+					}
+				],
+				"settings": {
+					"pie": {
+						"decimalLimit": 2,
+						"currencyFormat": "$"
+					}
+				}
+			}
+		},
+		{
+			"id": "1f532aa3-3a63-4c8c-a7ee-da13cf4807ad",
+			"title": "Top 10 AWS S3 Buckets Size and Cost",
+			"type": "table",
+			"config": {
+				"queries": [
+					{
+						"name": "query1",
+						"query": "find aws_s3_bucket with bucketSizeBytes!=undefined as bucket \nreturn \n    bucket.name, bucket.tag.AccountName, \n    bucket.numberOfObjects, bucket.bucketSizeBytes, \n    bucket.bucketSizeBytes / 1000000000 * 0.023 as monthlyCost,\n    bucket.lifecycleEnabled, bucket.retentionPeriod\norder by bucket.bucketSizeBytes DESC limit 10"
+					}
+				]
+			}
+		},
+		{
+			"id": "d740420f-df5c-4584-97a0-af96f69feb1f",
+			"title": "All S3 Buckets Size and Cost",
+			"type": "table",
+			"config": {
+				"queries": [
+					{
+						"name": "query1",
+						"query": "find aws_s3_bucket with bucketSizeBytes!=undefined as bucket \n    return \n        bucket.name, bucket.tag.AccountName, \n        bucket.numberOfObjects, bucket.bucketSizeBytes, \n        bucket.bucketSizeBytes / 1000000000 * 0.023 as monthlyCost,\n        bucket.lifecycleEnabled, bucket.retentionPeriod \n        ORDER BY bucket.bucketSizeBytes DESC"
+					}
+				]
+			}
+		},
+		{
+			"id": "8f265071-eb91-45b2-ae07-a7a68450edf8",
+			"title": "Monthly RDS DataBase Backups Cost",
+			"type": "table",
+			"config": {
+				"queries": [
+					{
+						"name": "query1",
+						"query": "Find (aws_db_cluster_snapshot|aws_db_snapshot) as snapshot\nReturn\n    snapshot.displayName,\n    snapshot.tag.AccountName as Account,\n    snapshot.allocatedStorage,\n    sum(snapshot.allocatedStorage) * 0.02 as EstimatedCost\n    ORDER BY snapshot.allocatedStorage DESC\n"
+					}
+				]
+			}
+		},
+		{
+			"id": "664615c9-2ce7-450f-8941-a75d7c10675f",
+			"title": "Disks not not in use",
+			"type": "table",
+			"config": {
+				"queries": [
+					{
+						"name": "query1",
+						"query": "Find Disk with _class!='Backup' as d\n    that !uses (Host|Configuration)\n    return\n        d.displayName,\n        d.tag.AccountName,\n        d.size,\n        d.sizeGB,\n        d.diskSizeBytes,\n        d.diskSizeGb"
+					}
+				]
+			}
+		},
+		{
+			"id": "77f6a743-ee88-4937-8365-2ed9766b5178",
+			"title": "EBS volumes attached to non-active EC2 instances",
+			"type": "table",
+			"config": {
+				"queries": [
+					{
+						"name": "query1",
+						"query": "Find aws_ebs_volume as e \n    that USES aws_instance with active!=true \n    return \n        e.displayName, \n        e.encrypted, \n        e.size, \n        e.volumeType"
+					}
+				]
+			}
+		},
+		{
+			"id": "0f7e784b-04b6-4453-9df8-f042b6cee03e",
+			"title": "Unused Elastic IPs",
+			"type": "table",
+			"config": {
+				"queries": [
+					{
+						"name": "query1",
+						"query": "find aws_eip \n    that uses aws_instance WITH active != true AND state = 'stopped'"
+					}
+				]
+			}
+		},
+		{
+			"id": "582e9d03-c7f7-4f9b-b3ef-57b3ddec26cc",
+			"title": "Elastic IPs not using an ENI",
+			"type": "table",
+			"config": {
+				"queries": [
+					{
+						"name": "query1",
+						"query": "find aws_eip \n    that !uses aws_eni"
+					}
+				]
+			}
+		},
+		{
+			"id": "b1cb9a51-8c9f-4029-ab9f-dcb8573d4da1",
+			"title": "EC2 instances using more than one EIP",
+			"type": "table",
+			"config": {
+				"queries": [
+					{
+						"name": "query1",
+						"query": "find aws_eip \n    that uses aws_instance\n    that uses aws_eip"
+					}
+				]
+			}
+		},
+		{
+			"id": "59c1a29c-fd9a-45c9-a2c5-b4c056c2c676",
+			"title": "",
+			"type": "markdown",
+			"config": {
+				"queries": [],
+				"settings": {
+					"markdown": {
+						"text": "Price for an unused EIP, additional EIP, or an EIP not attached to an ENI is $0.005/hour"
+					}
+				}
+			}
+		}
+	],
+	"layouts": {
+		"sm": [
+			{
+				"x": 0,
+				"h": 2,
+				"i": "adf85428-00dd-4903-a621-09509fffe5fd",
+				"y": 1000000000000,
+				"w": 2
+			},
+			{
+				"x": 0,
+				"h": 2,
+				"i": "1f532aa3-3a63-4c8c-a7ee-da13cf4807ad",
+				"y": 1000000000000,
+				"w": 2
+			}
+		],
+		"xs": [],
+		"lg": [
+			{
+				"static": false,
+				"w": 4,
+				"moved": false,
+				"h": 3,
+				"x": 0,
+				"y": 0,
+				"i": "adf85428-00dd-4903-a621-09509fffe5fd"
+			},
+			{
+				"static": false,
+				"w": 8,
+				"moved": false,
+				"h": 3,
+				"x": 4,
+				"y": 0,
+				"i": "1f532aa3-3a63-4c8c-a7ee-da13cf4807ad"
+			},
+			{
+				"static": false,
+				"w": 8,
+				"moved": false,
+				"h": 2,
+				"x": 4,
+				"y": 3,
+				"i": "d740420f-df5c-4584-97a0-af96f69feb1f"
+			},
+			{
+				"static": false,
+				"w": 8,
+				"moved": false,
+				"h": 2,
+				"x": 4,
+				"y": 5,
+				"i": "8f265071-eb91-45b2-ae07-a7a68450edf8"
+			},
+			{
+				"static": false,
+				"w": 8,
+				"moved": false,
+				"h": 2,
+				"x": 4,
+				"y": 7,
+				"i": "664615c9-2ce7-450f-8941-a75d7c10675f"
+			},
+			{
+				"static": false,
+				"w": 4,
+				"moved": false,
+				"h": 6,
+				"x": 0,
+				"y": 3,
+				"i": "77f6a743-ee88-4937-8365-2ed9766b5178"
+			},
+			{
+				"static": false,
+				"w": 12,
+				"moved": false,
+				"h": 2,
+				"x": 0,
+				"y": 9,
+				"i": "0f7e784b-04b6-4453-9df8-f042b6cee03e"
+			},
+			{
+				"static": false,
+				"w": 12,
+				"moved": false,
+				"h": 2,
+				"x": 0,
+				"y": 11,
+				"i": "582e9d03-c7f7-4f9b-b3ef-57b3ddec26cc"
+			},
+			{
+				"static": false,
+				"w": 9,
+				"moved": false,
+				"h": 2,
+				"x": 0,
+				"y": 13,
+				"i": "b1cb9a51-8c9f-4029-ab9f-dcb8573d4da1"
+			},
+			{
+				"static": false,
+				"w": 3,
+				"moved": false,
+				"h": 2,
+				"x": 9,
+				"y": 13,
+				"i": "59c1a29c-fd9a-45c9-a2c5-b4c056c2c676"
+			}
+		],
+		"xl": [],
+		"md": []
+	}
+}
