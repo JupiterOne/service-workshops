@@ -1,7 +1,7 @@
 # Title Of Hip Pocket
 This Workshop will provide guidance on how to perform the following topic in the J1 Platform
 
-This concept is relevant to {{Persona}} who wishes to {{MaturityModel Concept/Use Case/App Specific Operation}}
+This concept is relevant to {{Persona/CommonTitle}} who wishes to {{MaturityModel Concept/Use Case/App Specific Operation}}
 
 The information obtained in this query can be used to provide evidence for {{compliance_control from J1's supplied policies}}, as well as be customized for alerting and insight dashboards.
 
