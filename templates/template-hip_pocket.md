@@ -30,4 +30,5 @@ The results in this query show a User's name obtained through their `vendor_user
 
 
 **Alert/Dashboard/Question**
+
 Include an example of an alert or dashboard that may be relevant to this use case
