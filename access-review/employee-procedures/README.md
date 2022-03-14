@@ -79,7 +79,7 @@ The example above will show all user account associated with each Person in your
 
 ### Offboarding Review
 
-_The example shows a list of terminated OneLogin user's with active accounts_:
+_The example shows a list of terminated OneLogin user's with active accounts in other services_:
 ```
 FIND onelogin_user with status=0
     THAT IS Person
