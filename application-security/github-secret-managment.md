@@ -70,3 +70,17 @@ Find Secret
 The query above would surface any `Secret` that has an `Alert` associated with it of non-informational severity, or that has a compliance gap.
 
 >`Problem` is a JupiterOne class that can be used to identify entities with any Alert of compliance gap associated with them. From the JupiterOne graph view, `Problem` entities will have a red dot on their node.
+
+### GitHub User That Can Export Secrets
+
+Github user's with the WRITE, MAINTAIN, or ADMIN role are able to potentially export secrets from the developed application:
+``` 
+Find github_user as u 
+    (that has github_team)? 
+    that allows as perm CodeRepo as repo 
+    THAT HAS Secret 
+    where perm.role=("WRITE" OR "MAINTAIN" OR "ADMIN") 
+    RETURN u.login as username, repo.displayName as Repository
+```
+This query will return a list of high privileged User's username, and code repository.
+
