@@ -17,7 +17,11 @@ The session will use concepts shown in {{workshops - J1QL,Advance}}.
 
 ## Core Concept Number 1
 
-Describe the concept and what relevant _class, _type or relationship that is useful in understanding this concept
+Describe the concept and what relevant topics JupiterOne covers relating to this concept
+
+### Relevant Query
+
+Describe the _class, _type or relationship that is useful in understanding this concept
 
 ```
 Code or Query - If a query is used, make sure to provide a RETURN value
