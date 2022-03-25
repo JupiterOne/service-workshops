@@ -62,6 +62,12 @@ FIND onelogin_user with status=0
 <TBD - azure_user with accountEnabled=true>
 
 >The property `active=false` may be used in some cases to highlight terminated users, but can also be used for other status', such as suspended or locked accounts.
+    
+### Inactive User
+    
+```
+find okta_user with active=true and lastLoginOn < date.now-90 day
+```
 
 ## Relating User Accounts Across Different Services
 
