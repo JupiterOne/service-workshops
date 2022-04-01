@@ -1,6 +1,6 @@
 # AWS Cost Analysis
 
-In this workshop, we will go over queries that are useful for identify resources that can result in increasing costs and attack surface within your AWS environment. Examples will include identifying DataStore usage, unused resources, as well as how to evaluates the costs and risk of these entities across your AWS organization within the JupiterOne platform. This workshop will include several customizable Alert Rules, as well as an Insight Dashboard useful for continually monitoring your AWS environment's ongoing changes.
+In this workshop, we will go over queries that are useful for identifying resources that can result in increasing costs and attack surface within your AWS environment. Examples will include identifying DataStore usage, unused resources, as well as how to evaluates the costs and risk of these entities across your AWS organization within the JupiterOne platform. This workshop will include customizable Alert Rules, as well as an Insight Dashboard useful for continually monitoring your AWS environment's ongoing changes.
 
 This concept is relevant to Managers and Directors who need to understand the resources and costs across an AWS organization. 
 
