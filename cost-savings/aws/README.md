@@ -176,7 +176,7 @@ This query will return a list of EIPs not being connected hosts or network inter
 
 ## Account and Services Evaluation
 
-There are several other r
+There are several other areas worth addressing when performing cost anaylsis across your AWS environement.
 
 ### AWS Regions In Use 
 
