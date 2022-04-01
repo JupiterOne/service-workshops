@@ -28,7 +28,7 @@ b.accountId ORDER BY Size DESC
 
 This query will show a list of S3 buckets across the entire organization, ordered by Size. This will also contain a creation date, the bucket's name, as well as accountId associated with the bucket.
 
->This query leverages the `ORDER BY` function. This can be used to order values within the `RETURN`. Columns can be ordered `ASC` or `DESC`.
+>This query leverages the `ORDER BY` function. This can be used to order values within the `RETURN`. Data can be ordered `ASC` or `DESC`.
 
 #### S3 Average Account Bucket Size
 
