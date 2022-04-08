@@ -92,19 +92,45 @@ This query will return a list of Disk entities currently not in use.
 
 Having a general overview of storage usage across an AWS environment is also important when performing a cost analysis exercise. 
 
-
+<!--- 
 ```
 FIND aws_db_cluster_snapshot with _source!="system-mapper" and allocatedStorage!=undefined AS s return s.allocatedStorage as Size, s.displayName, s.createdOn ORDER By Size DESC
 ```
-
+--->
+```
+FIND aws_db_cluster_snapshot with _source!="system-mapper" and allocatedStorage!=undefined as b 
+  return b.tag.AccountName as Account, 
+    SUM(b.allocatedStorage) as TotalSize, 
+    AVG(b.allocatedStorage) as AverageSize, 
+    MAX(b.allocatedStorage) as LargestSnapshot,
+    COUNT(b) as TotalSnapshots ORDER BY AverageSize DESC
+```
+<!--- 
 ```
 Find aws_ebs_volume with size!=undefined as d RETURN d.size as Size, d.arn, d.createdOn ORDER BY Size DESC
 ```
-
+--->
+```
+FIND aws_ebs_volume with size!=undefined as b 
+  return b.tag.AccountName as Account, 
+    SUM(b.size) as TotalSize, 
+    AVG(b.size) as AverageSize, 
+    MAX(b.size) as LargestVolume,
+    COUNT(b) as TotalVolume ORDER BY AverageSize DESC
+```
+<!--- 
 ```
 Find aws_ebs_snapshot with volumeSize!=undefined as d RETURN d.volumeSize as Size, d.arn, d.createdOn ORDER BY Size DESC
 ```
-
+--->
+```
+FIND aws_ebs_snapshot with volumeSize!=undefined as b 
+  return b.tag.AccountName as Account, 
+    SUM(b.volumeSize) as TotalSize, 
+    AVG(b.volumeSize) as AverageSize, 
+    MAX(b.volumeSize) as LargestSnapshot,
+    COUNT(b) as TotalSnapshots ORDER BY AverageSize DESC
+```
 These three queries show current Snapshot usage across an org.
 
 
