@@ -27,7 +27,7 @@
 				"queries": [
 					{
 						"name": "query1",
-						"query": "find aws_s3_bucket with bucketSizeBytes!=undefined as bucket \nreturn \n    bucket.name, bucket.tag.AccountName, \n    bucket.numberOfObjects, bucket.bucketSizeBytes, \n    bucket.bucketSizeBytes / 1000000000 * 0.023 as monthlyCost,\n    bucket.lifecycleEnabled, bucket.retentionPeriod\norder by bucket.bucketSizeBytes DESC limit 10"
+						"query": "find aws_s3_bucket with bucketSizeBytes!=undefined as bucket \nreturn \n    bucket.name as Name, \n    bucket.tag.AccountName as Account, \n    bucket.numberOfObjects as \"Number of Objects\", \n    bucket.bucketSizeBytes as Size, \n    bucket.bucketSizeBytes / 1000000000 * 0.023 as \"Monthly Cost\",\n    bucket.lifecycleEnabled, bucket.retentionPeriod\norder by bucket.bucketSizeBytes DESC limit 10"
 					}
 				]
 			}
@@ -40,20 +40,20 @@
 				"queries": [
 					{
 						"name": "query1",
-						"query": "find aws_s3_bucket with bucketSizeBytes!=undefined as bucket \n    return \n        bucket.name, bucket.tag.AccountName, \n        bucket.numberOfObjects, bucket.bucketSizeBytes, \n        bucket.bucketSizeBytes / 1000000000 * 0.023 as monthlyCost,\n        bucket.lifecycleEnabled, bucket.retentionPeriod \n        ORDER BY bucket.bucketSizeBytes DESC"
+						"query": "find aws_s3_bucket with bucketSizeBytes!=undefined as bucket \n    return \n        bucket.name as Name, \n        bucket.tag.AccountName as Account, \n        bucket.numberOfObjects as \"Number of Objects\", \n        bucket.bucketSizeBytes as Size, \n        bucket.bucketSizeBytes / 1000000000 * 0.023 as \"Monthly Cost\",\n        bucket.lifecycleEnabled, bucket.retentionPeriod \n        ORDER BY bucket.bucketSizeBytes DESC"
 					}
 				]
 			}
 		},
 		{
 			"id": "8f265071-eb91-45b2-ae07-a7a68450edf8",
-			"title": "Monthly RDS DataBase Backups Cost",
+			"title": "Monthly Database Backup Cost",
 			"type": "table",
 			"config": {
 				"queries": [
 					{
 						"name": "query1",
-						"query": "Find (aws_db_cluster_snapshot|aws_db_snapshot) as snapshot\nReturn\n    snapshot.displayName,\n    snapshot.tag.AccountName as Account,\n    snapshot.allocatedStorage,\n    sum(snapshot.allocatedStorage) * 0.02 as EstimatedCost\n    ORDER BY snapshot.allocatedStorage DESC\n"
+						"query": "Find (aws_db_cluster_snapshot|aws_db_snapshot) as snapshot\nReturn\n    snapshot.displayName as Name,\n    snapshot.tag.AccountName as Account,\n    snapshot.allocatedStorage as Storage,\n    sum(snapshot.allocatedStorage) * 0.02 as EstimatedCost\n    ORDER BY snapshot.allocatedStorage DESC\n"
 					}
 				]
 			}
@@ -66,33 +66,37 @@
 				"queries": [
 					{
 						"name": "query1",
-						"query": "Find Disk with _class!='Backup' as d\n    that !uses (Host|Configuration)\n    return\n        d.displayName,\n        d.tag.AccountName,\n        d.size,\n        d.sizeGB,\n        d.diskSizeBytes,\n        d.diskSizeGb"
+						"query": "Find Disk with _class!='Backup' as d\n    that !uses (Host|Configuration)\n    return\n        d.displayName as Name,\n        d.tag.AccountName as Account,\n        d.size as SizeInGB,\n        d.sizeGB as SizeInGB,\n        d.diskSizeBytes as \"Size in Bytes\",\n        d.diskSizeGb as SizeInGB\n        order by SizeInGB DESC"
 					}
 				]
 			}
 		},
 		{
 			"id": "77f6a743-ee88-4937-8365-2ed9766b5178",
-			"title": "EBS volumes attached to non-active EC2 instances",
+			"title": "EBS volumes attached to inactive EC2 instances",
 			"type": "table",
 			"config": {
 				"queries": [
 					{
 						"name": "query1",
-						"query": "Find aws_ebs_volume as e \n    that USES aws_instance with active!=true \n    return \n        e.displayName, \n        e.encrypted, \n        e.size, \n        e.volumeType"
+						"query": "Find aws_ebs_volume as e \n    that USES aws_instance with active!=true \n    return \n        e.displayName as Name, \n        e.encrypted as Encrypted, \n        e.size as Size, \n        e.volumeType as Type"
 					}
 				]
 			}
 		},
 		{
 			"id": "0f7e784b-04b6-4453-9df8-f042b6cee03e",
-			"title": "Unused Elastic IPs",
+			"title": "EIPS used by an Inactive EC2 Instance",
 			"type": "table",
 			"config": {
 				"queries": [
 					{
 						"name": "query1",
 						"query": "find aws_eip \n    that uses aws_instance WITH active != true AND state = 'stopped'"
+					},
+					{
+						"name": "query2",
+						"query": "find aws_eip that !(uses|has) *"
 					}
 				]
 			}
@@ -124,16 +128,224 @@
 			}
 		},
 		{
-			"id": "59c1a29c-fd9a-45c9-a2c5-b4c056c2c676",
+			"id": "59b512e9-2a09-48a9-8cd6-5448adc2248c",
 			"title": "",
 			"type": "markdown",
 			"config": {
 				"queries": [],
 				"settings": {
 					"markdown": {
-						"text": "Price for an unused EIP, additional EIP, or an EIP not attached to an ENI is $0.005/hour"
+						"text": "# S3"
 					}
 				}
+			}
+		},
+		{
+			"id": "7e458705-8431-4184-941c-0b85a311ca12",
+			"title": "All S3 Buckets Ordered By Size",
+			"type": "table",
+			"config": {
+				"queries": [
+					{
+						"name": "query1",
+						"query": "find aws_s3_bucket with bucketSizeBytes!=undefined as b \nreturn b.bucketSizeBytes as Size, \nb.bucketName as \"Name\", \nb.createdOn as \"Creation Date\",  \nb.tag.AccountName as Account\nORDER BY Size DESC"
+					}
+				]
+			}
+		},
+		{
+			"id": "bda12493-ed87-4c7b-ba13-b5ae65a0e875",
+			"title": "S3 Total and Average Bucket Size by Account",
+			"type": "table",
+			"config": {
+				"queries": [
+					{
+						"name": "query1",
+						"query": "find aws_s3_bucket with bucketSizeBytes!=undefined as b \nreturn \nb.tag.AccountName as Account, \nSUM(b.bucketSizeBytes) as TotalSize, \nAVG(b.bucketSizeBytes) as AverageSize ORDER BY AverageSize DESC"
+					}
+				]
+			}
+		},
+		{
+			"id": "a113142e-5818-4762-b159-d896a9fd98b3",
+			"title": "",
+			"type": "markdown",
+			"config": {
+				"queries": [],
+				"settings": {
+					"markdown": {
+						"text": "# Unused Resources"
+					}
+				}
+			}
+		},
+		{
+			"id": "a58c58d1-97a6-4410-a7cc-057498b6db98",
+			"title": "",
+			"type": "markdown",
+			"config": {
+				"queries": [],
+				"settings": {
+					"markdown": {
+						"text": "# DynamoDB"
+					}
+				}
+			}
+		},
+		{
+			"id": "f602b290-c2be-4574-9cc8-d50c437b8cc6",
+			"title": "All DynamoDB Tables Size and Cost",
+			"type": "table",
+			"config": {
+				"queries": [
+					{
+						"name": "query1",
+						"query": "find aws_dynamodb_table with active=true as table \nreturn table.displayName as Name, \ntable.tag.AccountName as Account,\ntable.continuousBackupEnabled,\ntable.hasBackup,\ntable.itemCount,\ntable.tableSizeBytes as Size,\ntable.tableSizeBytes / 1000000000 * 0.25 as \"Monthly Cost\"\norder by Size DESC"
+					}
+				]
+			}
+		},
+		{
+			"id": "01b6c173-8206-4fdc-a318-9d362d220213",
+			"title": "",
+			"type": "markdown",
+			"config": {
+				"queries": [],
+				"settings": {
+					"markdown": {
+						"text": "# Backup"
+					}
+				}
+			}
+		},
+		{
+			"id": "1b95711f-6d63-4285-9af1-38f0d0e97dfb",
+			"title": "DB Cluster Snapshot Usage per Account",
+			"type": "table",
+			"config": {
+				"queries": [
+					{
+						"name": "query1",
+						"query": "FIND aws_db_cluster_snapshot with _source!=\"system-mapper\" and allocatedStorage!=undefined as b \n  return b.tag.AccountName as Account, \n    SUM(b.allocatedStorage) as TotalSize, \n    AVG(b.allocatedStorage) as AverageSize, \n    MAX(b.allocatedStorage) as LargestSnapshot,\n    COUNT(b) as TotalSnapshots ORDER BY AverageSize DESC"
+					}
+				]
+			}
+		},
+		{
+			"id": "a31c83d3-fad0-4e87-93be-7a95b59b572d",
+			"title": "EBS Volume Usage per Account",
+			"type": "table",
+			"config": {
+				"queries": [
+					{
+						"name": "query1",
+						"query": "FIND aws_ebs_volume with size!=undefined as b \n  return b.tag.AccountName as Account, \n    SUM(b.size) as TotalSize, \n    AVG(b.size) as AverageSize, \n    MAX(b.size) as LargestVolume,\n    COUNT(b) as TotalVolume ORDER BY AverageSize DESC"
+					}
+				]
+			}
+		},
+		{
+			"id": "47a6980f-ffe7-4734-9058-171694fdc6ad",
+			"title": "EBS Snapshot Usage Per Account",
+			"type": "table",
+			"config": {
+				"queries": [
+					{
+						"name": "query1",
+						"query": "FIND aws_ebs_snapshot with volumeSize!=undefined as b \n  return b.tag.AccountName as Account, \n    SUM(b.volumeSize) as TotalSize, \n    AVG(b.volumeSize) as AverageSize, \n    MAX(b.volumeSize) as LargestSnapshot,\n    COUNT(b) as TotalSnapshots ORDER BY AverageSize DESC"
+					}
+				]
+			}
+		},
+		{
+			"id": "7ac27dc7-0778-4c40-988a-c4f3ce2f45e2",
+			"title": "EC2 Usage Across Organization by Type",
+			"type": "table",
+			"config": {
+				"queries": [
+					{
+						"name": "query1",
+						"query": "find aws_instance with instanceType!=undefined as a \n    return a.instanceType as Type, \n    count(a) as Total,\n    a.tag.AccountName as AccountName,\n    a.accountId as AccountID\n    \n"
+					}
+				]
+			}
+		},
+		{
+			"id": "a765a75e-507e-4e28-ad62-7ffad64b0d09",
+			"title": "Inactive Instances (during the past 60 days)",
+			"type": "table",
+			"config": {
+				"queries": [
+					{
+						"name": "query1",
+						"query": "find Host with active = false and stateChangedOn < date.now - 60 day as h\n    return h.displayName as Name,\n    h.accountId as AccountId,\n    h.tag.AccountName as Account,\n    h.hibernationOptionsConfigured,\n    h.instanceType as Type,\n    h.public,\n    h.stateChangedOn"
+					}
+				]
+			}
+		},
+		{
+			"id": "deef5331-f06d-4faf-814d-c6cd2d7fec48",
+			"title": "",
+			"type": "markdown",
+			"config": {
+				"queries": [],
+				"settings": {
+					"markdown": {
+						"text": "# Elastic IPs"
+					}
+				}
+			}
+		},
+		{
+			"id": "ab8be70a-d052-48c5-b568-b9b162b1b384",
+			"title": "EIPs Not Currently Utilized",
+			"type": "table",
+			"config": {
+				"queries": [
+					{
+						"name": "query1",
+						"query": "Find aws_eip that !(USES|HAS) *"
+					}
+				]
+			}
+		},
+		{
+			"id": "50267b01-3803-477e-867f-1159c4a73028",
+			"title": "",
+			"type": "markdown",
+			"config": {
+				"queries": [],
+				"settings": {
+					"markdown": {
+						"text": "# Account and Services Evaluation"
+					}
+				}
+			}
+		},
+		{
+			"id": "e57be691-de2d-45cb-bac9-32b79fb260da",
+			"title": "AWS Regions in Use across Accounts",
+			"type": "table",
+			"config": {
+				"queries": [
+					{
+						"name": "query1",
+						"query": "Find UNIQUE * with _integrationType=\"aws\" and region!=undefined as a\n    RETURN a.region as AWSRegion, count(a.accountId) as NumberOfAccounts"
+					}
+				]
+			}
+		},
+		{
+			"id": "ff36efb1-f371-4ae1-b290-d8e2e4537cac",
+			"title": "Inactive External Identities",
+			"type": "table",
+			"config": {
+				"queries": [
+					{
+						"name": "query1",
+						"query": "Find AccessRole with lastUsedOn < date.now-15 day as Role \n    THAT TRUSTS * with _source=\"system-mapper\" as ext\n    RETURN ext.displayName as \"External Identity\", Role.tag.AccountName as Account, Role.accountId as AccountId, Role.displayName as \"Role Name\", Role._key, Role.lastUsedOn"
+					}
+				]
 			}
 		}
 	],
@@ -157,94 +369,238 @@
 		"xs": [],
 		"lg": [
 			{
-				"static": false,
-				"w": 4,
-				"moved": false,
-				"h": 3,
-				"x": 0,
-				"y": 0,
-				"i": "adf85428-00dd-4903-a621-09509fffe5fd"
-			},
-			{
-				"static": false,
-				"w": 8,
-				"moved": false,
-				"h": 3,
-				"x": 4,
-				"y": 0,
-				"i": "1f532aa3-3a63-4c8c-a7ee-da13cf4807ad"
-			},
-			{
-				"static": false,
-				"w": 8,
-				"moved": false,
-				"h": 2,
-				"x": 4,
-				"y": 3,
-				"i": "d740420f-df5c-4584-97a0-af96f69feb1f"
-			},
-			{
-				"static": false,
-				"w": 8,
-				"moved": false,
-				"h": 2,
-				"x": 4,
-				"y": 5,
-				"i": "8f265071-eb91-45b2-ae07-a7a68450edf8"
-			},
-			{
-				"static": false,
-				"w": 8,
-				"moved": false,
-				"h": 2,
-				"x": 4,
-				"y": 7,
-				"i": "664615c9-2ce7-450f-8941-a75d7c10675f"
-			},
-			{
-				"static": false,
-				"w": 4,
-				"moved": false,
-				"h": 6,
-				"x": 0,
-				"y": 3,
-				"i": "77f6a743-ee88-4937-8365-2ed9766b5178"
-			},
-			{
-				"static": false,
-				"w": 12,
-				"moved": false,
-				"h": 2,
-				"x": 0,
-				"y": 9,
-				"i": "0f7e784b-04b6-4453-9df8-f042b6cee03e"
-			},
-			{
-				"static": false,
-				"w": 12,
-				"moved": false,
+				"w": 5,
 				"h": 2,
 				"x": 0,
 				"y": 11,
-				"i": "582e9d03-c7f7-4f9b-b3ef-57b3ddec26cc"
+				"i": "adf85428-00dd-4903-a621-09509fffe5fd",
+				"moved": false,
+				"static": false
 			},
 			{
-				"static": false,
-				"w": 9,
-				"moved": false,
+				"w": 6,
 				"h": 2,
 				"x": 0,
-				"y": 13,
-				"i": "b1cb9a51-8c9f-4029-ab9f-dcb8573d4da1"
+				"y": 1,
+				"i": "1f532aa3-3a63-4c8c-a7ee-da13cf4807ad",
+				"moved": false,
+				"static": false
 			},
 			{
-				"static": false,
-				"w": 3,
-				"moved": false,
+				"w": 6,
 				"h": 2,
-				"x": 9,
+				"x": 6,
+				"y": 1,
+				"i": "d740420f-df5c-4584-97a0-af96f69feb1f",
+				"moved": false,
+				"static": false
+			},
+			{
+				"w": 7,
+				"h": 2,
+				"x": 5,
+				"y": 11,
+				"i": "8f265071-eb91-45b2-ae07-a7a68450edf8",
+				"moved": false,
+				"static": false
+			},
+			{
+				"w": 6,
+				"h": 2,
+				"x": 0,
+				"y": 14,
+				"i": "664615c9-2ce7-450f-8941-a75d7c10675f",
+				"moved": false,
+				"static": false
+			},
+			{
+				"w": 6,
+				"h": 2,
+				"x": 6,
+				"y": 18,
+				"i": "77f6a743-ee88-4937-8365-2ed9766b5178",
+				"moved": false,
+				"static": false
+			},
+			{
+				"w": 6,
+				"h": 2,
+				"x": 6,
+				"y": 21,
+				"i": "0f7e784b-04b6-4453-9df8-f042b6cee03e",
+				"moved": false,
+				"static": false
+			},
+			{
+				"w": 6,
+				"h": 2,
+				"x": 0,
+				"y": 23,
+				"i": "582e9d03-c7f7-4f9b-b3ef-57b3ddec26cc",
+				"moved": false,
+				"static": false
+			},
+			{
+				"w": 6,
+				"h": 2,
+				"x": 6,
+				"y": 23,
+				"i": "b1cb9a51-8c9f-4029-ab9f-dcb8573d4da1",
+				"moved": false,
+				"static": false
+			},
+			{
+				"w": 12,
+				"h": 1,
+				"x": 0,
+				"y": 0,
+				"i": "59b512e9-2a09-48a9-8cd6-5448adc2248c",
+				"moved": false,
+				"static": false
+			},
+			{
+				"w": 6,
+				"h": 2,
+				"x": 0,
+				"y": 3,
+				"i": "7e458705-8431-4184-941c-0b85a311ca12",
+				"moved": false,
+				"static": false
+			},
+			{
+				"w": 6,
+				"h": 2,
+				"x": 6,
+				"y": 3,
+				"i": "bda12493-ed87-4c7b-ba13-b5ae65a0e875",
+				"moved": false,
+				"static": false
+			},
+			{
+				"w": 12,
+				"h": 1,
+				"x": 0,
 				"y": 13,
-				"i": "59c1a29c-fd9a-45c9-a2c5-b4c056c2c676"
+				"i": "a113142e-5818-4762-b159-d896a9fd98b3",
+				"moved": false,
+				"static": false
+			},
+			{
+				"w": 12,
+				"h": 1,
+				"x": 0,
+				"y": 5,
+				"i": "a58c58d1-97a6-4410-a7cc-057498b6db98",
+				"moved": false,
+				"static": false
+			},
+			{
+				"w": 12,
+				"h": 2,
+				"x": 0,
+				"y": 6,
+				"i": "f602b290-c2be-4574-9cc8-d50c437b8cc6",
+				"moved": false,
+				"static": false
+			},
+			{
+				"w": 12,
+				"h": 1,
+				"x": 0,
+				"y": 8,
+				"i": "01b6c173-8206-4fdc-a318-9d362d220213",
+				"moved": false,
+				"static": false
+			},
+			{
+				"w": 12,
+				"h": 2,
+				"x": 0,
+				"y": 9,
+				"i": "1b95711f-6d63-4285-9af1-38f0d0e97dfb",
+				"moved": false,
+				"static": false
+			},
+			{
+				"w": 6,
+				"h": 2,
+				"x": 6,
+				"y": 14,
+				"i": "a31c83d3-fad0-4e87-93be-7a95b59b572d",
+				"moved": false,
+				"static": false
+			},
+			{
+				"w": 6,
+				"h": 2,
+				"x": 0,
+				"y": 16,
+				"i": "47a6980f-ffe7-4734-9058-171694fdc6ad",
+				"moved": false,
+				"static": false
+			},
+			{
+				"w": 6,
+				"h": 2,
+				"x": 6,
+				"y": 16,
+				"i": "7ac27dc7-0778-4c40-988a-c4f3ce2f45e2",
+				"moved": false,
+				"static": false
+			},
+			{
+				"w": 6,
+				"h": 2,
+				"x": 0,
+				"y": 18,
+				"i": "a765a75e-507e-4e28-ad62-7ffad64b0d09",
+				"moved": false,
+				"static": false
+			},
+			{
+				"w": 12,
+				"h": 1,
+				"x": 0,
+				"y": 20,
+				"i": "deef5331-f06d-4faf-814d-c6cd2d7fec48",
+				"moved": false,
+				"static": false
+			},
+			{
+				"w": 6,
+				"h": 2,
+				"x": 0,
+				"y": 21,
+				"i": "ab8be70a-d052-48c5-b568-b9b162b1b384",
+				"moved": false,
+				"static": false
+			},
+			{
+				"w": 12,
+				"h": 1,
+				"x": 0,
+				"y": 25,
+				"i": "50267b01-3803-477e-867f-1159c4a73028",
+				"moved": false,
+				"static": false
+			},
+			{
+				"w": 4,
+				"h": 2,
+				"x": 4,
+				"y": 28,
+				"i": "e57be691-de2d-45cb-bac9-32b79fb260da",
+				"moved": false,
+				"static": false
+			},
+			{
+				"w": 12,
+				"h": 2,
+				"x": 0,
+				"y": 26,
+				"i": "ff36efb1-f371-4ae1-b290-d8e2e4537cac",
+				"moved": false,
+				"static": false
 			}
 		],
 		"xl": [],
