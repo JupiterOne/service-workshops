@@ -106,11 +106,64 @@ Lastly, lets identify any User that can access our AWS environment:
 Find UNIQUE User as u
   (THAT (ASSIGNED|HAS) UserGroup)? 
   (THAT ASSIGNED AccessRole)? 
-  THAT ASSIGNED AccessPolicy 
-  THAT ALLOWS * with _type^="aws" 
+  THAT ASSIGNED AccessPolicy  
   Return u.displayName, u._type, u.email
 ```
-**Relevant Materials**
+
+## Trust Policy
+
+Access Role's can be configured delegate its permissions to another user. While this can be helpful for sharing resources across accounts, this functionality should only be performed on validated entities.
+
+**AccessRole with AssumeTrust***
+
+```
+Find aws_iam_role with _source="integration-managed" that TRUSTS *
+
+```
+
+This query will show all AWS AccessRole's that be assumed.
+
+>In the example above, the `__source="integration-managed"` is used to specify only roles that belong to your data sources.  The `TRUSTS` relationship is used to convey that a AssumeRole exists in this role.
+
+**Conditional Trust**
+
+A trust can be provided under certain conditions. These conditions can be extracted from the `TRUSTS` relationship.
+
+```
+Find aws_iam_role with _source="integration-managed" as role 
+  THAT TRUSTS as t (AccessRole|User|Account)
+  WHERE t.conditional=true
+  RETURN t.roleName, t.conditions, t.principal
+```
+
+This query shows roles that have a conditional trust, what conditions do those trust exist under, and who is the pricipal.
+
+
+**Assume Role Trust External entity**
+
+If an external entitiy is trusted by an assume role, this entity should be validated.
+
+```
+Find aws_account as aws that HAS aws_iam 
+  that HAS aws_iam_role as role 
+  that TRUSTS (AccessRole|User|Account) with _source='system-mapper' as e 
+  return aws.name, aws.accountId, role.roleName, e.displayName, e._type, e.arn 
+```
+
+This query will return AWS accounts with an assume that has a trust relationship with an external entity.
+
+>The `_source='system-mapper'` propery is used to only surface data that is discovered. This is data not provided by integration-managed data, but from the details of that data.
+
+One way to enrich the data in order to provide better results is the `validate` the the trusted entities. This can be performed using the entities `validate` switch.  One excellent example of a trusted external entity is the AWS account "612791702201", as this is the JupiterOne account used within your AWS account to ingest data.  Additional examples of trusted roles would be other vendors with access to your AWS environements. 
+
+Once you have `validated` the necessary accounts, the `aws-unvalidated-external-trusts` Alert Rule is an excellect alert for monitoring for external entities. This Alert Rule is apart of the AWS Threat Alert Rule pack.
+
+```
+Find * that HAS Alert with displayName="aws-unvalidated-external-trusts"
+```
+
+
+## Relevant Materials
 
 https://support.jupiterone.io/hc/en-us/articles/360024909153-Identity-People-and-Privileged-access#whoorwhatservicehasbeenassignedpermissionswithadministratorprivilegedaccess
 
