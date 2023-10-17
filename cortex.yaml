@@ -1,0 +1,12 @@
+openapi: 3.0.1
+info:
+  title: service-workshops
+  description: Automatically generated package.json, please edit manually
+  x-cortex-git:
+    github:
+      repository: JupiterOne/service-workshops
+  x-cortex-owners:
+    - type: group
+      name: JupiterOne/solutions
+  x-cortex-service-groups: tier-4
+  x-cortex-tag: service-workshops

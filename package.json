@@ -1,0 +1,10 @@
+{
+  "name": "service-workshops",
+  "version": "0.0.0",
+  "description": "Automatically generated package.json, please edit manually",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/JupiterOne/service-workshops"
+  },
+  "license": "UNLICENSED"
+}
